@@ -594,7 +594,10 @@ void Sub::handle_jsbutton_press(uint8_t button, bool shift, bool held)
         break;
 
     case JSButton::button_function_t::k_custom_1:
-        // Not implemented
+        // switch between moving to vertical position and sticking to the wall
+        if (!held) {
+            pitch_and_dock = !pitch_and_dock;
+        }
         break;
     case JSButton::button_function_t::k_custom_2:
         // Not implemented
@@ -701,7 +704,7 @@ void Sub::default_js_buttons()
         {JSButton::button_function_t::k_none,                   JSButton::button_function_t::k_none},
         {JSButton::button_function_t::k_mode_manual,            JSButton::button_function_t::k_none},
         {JSButton::button_function_t::k_mode_depth_hold,        JSButton::button_function_t::k_none},
-        {JSButton::button_function_t::k_mode_stabilize,         JSButton::button_function_t::k_none},
+        {JSButton::button_function_t::k_mode_acro,              JSButton::button_function_t::k_custom_1},
 
         {JSButton::button_function_t::k_disarm,                 JSButton::button_function_t::k_none},
         {JSButton::button_function_t::k_shift,                  JSButton::button_function_t::k_none},

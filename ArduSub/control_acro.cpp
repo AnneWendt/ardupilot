@@ -22,8 +22,6 @@ bool Sub::acro_init()
 // should be called at 100hz or more
 void Sub::acro_run()
 {
-    float target_roll, target_pitch, target_yaw;
-
     // if not armed set throttle to zero and exit immediately
     if (!motors.armed()) {
         motors.set_desired_spool_state(AP_Motors::DesiredSpoolState::GROUND_IDLE);
@@ -34,21 +32,32 @@ void Sub::acro_run()
 
     motors.set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
 
-    // convert the input to the desired body frame rate
-    get_pilot_desired_angle_rates(channel_roll->get_control_in(), channel_pitch->get_control_in(), channel_yaw->get_control_in(), target_roll, target_pitch, target_yaw);
+    if (pitch_and_dock) {
+        //we're still trying to maneuver ourselves into the correct position
+        //pitch to 90 degrees and let the ROV move around
+        attitude_control.input_euler_angle_roll_pitch_yaw(0.0F, 8900.0F, 0.0F, true);
+        motors.set_throttle(channel_throttle->norm_input());
+        motors.set_forward(channel_forward->norm_input());
+        motors.set_lateral(channel_lateral->norm_input());
+    } else {
+        //we are ready to dock to the wall
+        motors.set_throttle(0.5 - (gain/2));
+    }
 
-    // run attitude controller
-    attitude_control.input_rate_bf_roll_pitch_yaw(target_roll, target_pitch, target_yaw);
+    //motors.set_roll(0.0F);
+    //motors.set_pitch((pitch_and_throttle ? (0.0F - gain) : 0.0F));
+    //motors.set_pitch(0.0F); //goes into full spin for some reason
+    //motors.set_yaw(0.0F);
+    //motors.set_throttle(0.5F); //neutral throttle
+    //motors.set_throttle(0.5 - (gain/2)); //works with ROV!
+    //motors.set_forward(0.0F);  //positive is forward, negative is backward
+    //motors.set_lateral(0.0F);  //positive is right, negative is left
 
-    // output pilot's throttle without angle boost
-    attitude_control.set_throttle_out(channel_throttle->norm_input(), false, g.throttle_filt);
-
-    //control_in is range 0-1000
-    //radio_in is raw pwm value
-    motors.set_forward(channel_forward->norm_input());
-    motors.set_lateral(channel_lateral->norm_input());
+    //attitude_control.input_euler_angle_roll_pitch_yaw(0.0F, 89.0F, 0.0F, true); //only spins a little bit but nothing else
+    //attitude_control.input_euler_angle_roll_pitch_yaw(0.0F, 8900.0F, 0.0F, true);
 }
 
+// This method is not necessary for Frankenstein, but who knows what else is using it so let's keep it here just to be on the safe side
 
 // get_pilot_desired_angle_rates - transform pilot's roll pitch and yaw input into a desired lean angle rates
 // returns desired angle rates in centi-degrees-per-second

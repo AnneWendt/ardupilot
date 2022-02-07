@@ -710,6 +710,8 @@ private:
     static_assert(_failsafe_priorities[ARRAY_SIZE(_failsafe_priorities) - 1] == -1,
                   "_failsafe_priorities is missing the sentinel");
 
+    // says whether we're still trying to maneuver ourselves into spiderman position
+    bool pitch_and_dock = true;
 
 public:
     void mavlink_delay_cb();
