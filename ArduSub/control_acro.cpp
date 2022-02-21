@@ -15,6 +15,9 @@ bool Sub::acro_init()
     // set to neutral to prevent chaotic behavior (esp. roll/pitch)
     set_neutral_controls();
 
+    // make sure the user knows this is a modified ArduSub
+    gcs().send_text(MAV_SEVERITY_INFO,"#Acrobatics mode for maintenance work");
+
     return true;
 }
 
