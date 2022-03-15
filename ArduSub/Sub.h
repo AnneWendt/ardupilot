@@ -712,6 +712,8 @@ private:
 
     // says whether we're still trying to maneuver ourselves into spiderman position
     bool pitch_and_dock = true;
+    // remember the heading when we switch into acro mode
+    int32_t acro_start_yaw = 0;
 
 public:
     void mavlink_delay_cb();

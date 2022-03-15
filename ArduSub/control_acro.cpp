@@ -18,6 +18,9 @@ bool Sub::acro_init()
     // make sure the user knows this is a modified ArduSub
     gcs().send_text(MAV_SEVERITY_INFO,"#Acrobatics mode for maintenance work");
 
+    // get and save current yaw
+    acro_start_yaw = ahrs.yaw_sensor;
+
     return true;
 }
 
@@ -38,7 +41,9 @@ void Sub::acro_run()
     if (pitch_and_dock) {
         //we're still trying to maneuver ourselves into the correct position
         //pitch to 90 degrees and let the ROV move around
-        attitude_control.input_euler_angle_roll_pitch_yaw(0.0F, 8900.0F, 0.0F, true);
+        attitude_control.input_euler_angle_roll_pitch_yaw(0.0F, 8900.0F, acro_start_yaw, true);
+        //intention: turn ROV using the roll input - problem: this function triggers INSTANT movement to target
+        //attitude_control.input_euler_angle_roll_pitch_yaw(0.0F, 8900.0F, 18000 * channel_roll->norm_input(), true);
         motors.set_throttle(channel_throttle->norm_input());
         motors.set_forward(channel_forward->norm_input());
         motors.set_lateral(channel_lateral->norm_input());
@@ -57,7 +62,7 @@ void Sub::acro_run()
     //motors.set_lateral(0.0F);  //positive is right, negative is left
 
     //attitude_control.input_euler_angle_roll_pitch_yaw(0.0F, 89.0F, 0.0F, true); //only spins a little bit but nothing else
-    //attitude_control.input_euler_angle_roll_pitch_yaw(0.0F, 8900.0F, 0.0F, true);
+    //attitude_control.input_euler_angle_roll_pitch_yaw(0.0F, 8900.0F, 0.0F, true);  //works with ROV but always turns North because of yaw = 0
 }
 
 // This method is not necessary for Frankenstein, but who knows what else is using it so let's keep it here just to be on the safe side
