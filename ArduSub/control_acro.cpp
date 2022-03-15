@@ -49,7 +49,17 @@ void Sub::acro_run()
         motors.set_lateral(channel_lateral->norm_input());
     } else {
         //we are ready to dock to the wall
-        motors.set_throttle(0.5 - (gain/2));
+        //motors.set_throttle(0.5 - (gain/2));
+        //attitude_control.set_throttle_out(0.5 - (gain/2), true, g.throttle_filt);
+        //both of the above did not work as intended, so hack thrusters directly
+        motors.output_test_num(0, 1500);
+        motors.output_test_num(1, 1500);
+        motors.output_test_num(2, 1500);
+        motors.output_test_num(3, 1500);
+        motors.output_test_num(4, 1500 - (400 * gain));  //reversed!
+        motors.output_test_num(5, 1500 + (400 * gain));
+        motors.output_test_num(6, 1500 + (400 * gain));
+        motors.output_test_num(7, 1500 - (400 * gain));  //reversed!
     }
 
     //motors.set_roll(0.0F);
