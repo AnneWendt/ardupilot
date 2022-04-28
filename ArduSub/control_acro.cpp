@@ -51,15 +51,25 @@ void Sub::acro_run()
         //we are ready to dock to the wall
         //motors.set_throttle(0.5 - (gain/2));
         //attitude_control.set_throttle_out(0.5 - (gain/2), true, g.throttle_filt);
-        //both of the above did not work as intended, so hack thrusters directly
+        //both of the above did not work as intended, so hack thrusters directly:
+        //turn off all the sideways thrusters
         motors.output_test_num(0, 1500);
         motors.output_test_num(1, 1500);
         motors.output_test_num(2, 1500);
         motors.output_test_num(3, 1500);
-        motors.output_test_num(4, 1500 - (400 * gain));  //reversed!
-        motors.output_test_num(5, 1500 + (400 * gain));
-        motors.output_test_num(6, 1500 + (400 * gain));
-        motors.output_test_num(7, 1500 - (400 * gain));  //reversed!
+        //set all up-down thrusters to downwards movement depending on gain
+        //var_info holds motor direction: 1 = normal, -1 = reversed
+        //motors.output_test_num(4, 1500 + (motors.var_info[5].def_value * 400 * gain));
+        //but def_value is just the default value and we had to make _motor_reverse public to access the actual value
+        motors.output_test_num(4, 1500 + (motors._motor_reverse[4] * 400 * gain));
+        motors.output_test_num(5, 1500 + (motors._motor_reverse[5] * 400 * gain));
+        motors.output_test_num(6, 1500 + (motors._motor_reverse[6] * 400 * gain));
+        motors.output_test_num(7, 1500 + (motors._motor_reverse[7] * 400 * gain));
+
+        //now that I think about it, I haven't actually tried these two lines at the same time:
+        //attitude_control.input_euler_angle_roll_pitch_yaw(0.0F, 8900.0F, acro_start_yaw, true);
+        //motors.set_throttle(0.5 - (gain/2));
+        //but since I haven't tested this, I don't just want to put it in now
     }
 
     //motors.set_roll(0.0F);
