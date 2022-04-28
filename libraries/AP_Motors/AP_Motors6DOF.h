@@ -56,6 +56,7 @@ public:
     // var_info for holding Parameter information
     static const struct AP_Param::GroupInfo        var_info[];
 
+    AP_Int8             _motor_reverse[AP_MOTORS_MAX_NUM_MOTORS];
 protected:
     // return current_limit as a number from 0 ~ 1 in the range throttle_min to throttle_max
     float               get_current_limit_max_throttle() override;
@@ -68,7 +69,6 @@ protected:
     void output_armed_stabilizing_vectored_6dof();
 
     // Parameters
-    AP_Int8             _motor_reverse[AP_MOTORS_MAX_NUM_MOTORS];
     AP_Float            _forwardVerticalCouplingFactor;
 
     float               _throttle_factor[AP_MOTORS_MAX_NUM_MOTORS]; // each motors contribution to throttle (climb/descent)
